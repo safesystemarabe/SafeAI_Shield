@@ -18,3 +18,5 @@ git clone https://github.com/safesystemarabe/SafeAI_Shield.git
 cd SafeAI_Shield
 pip install -r requirements.txt
 python safeai_shield.py
+
+🌍 رسالتنا
