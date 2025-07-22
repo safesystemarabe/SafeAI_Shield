@@ -128,3 +128,47 @@ def save_settings(self):
         QtWidgets.QMessageBox.information(self, "تم الحفظ", "تم حفظ الإعدادات بنجاح!")
     except Exception as e:
         QtWidgets.QMessageBox.critical(self, "خطأ", f"فشل في حفظ الإعدادات: {str(e)}")
+def update_plot(self):
+    """تحديث الرسم البياني للأداء"""
+    try:
+        # الحصول على بيانات الأداء
+        cpu_usage = psutil.cpu_percent()
+        mem_usage = psutil.virtual_memory().percent
+        
+        # تحديث البيانات التاريخية
+        if not hasattr(self, 'cpu_history'):
+            self.cpu_history = []
+            self.mem_history = []
+            
+        self.cpu_history.append(cpu_usage)
+        self.mem_history.append(mem_usage)
+        
+        # الحفاظ على طول محدد للبيانات التاريخية
+        max_history = 60
+        if len(self.cpu_history) > max_history:
+            self.cpu_history = self.cpu_history[-max_history:]
+            self.mem_history = self.mem_history[-max_history:]
+        
+        # إعداد الرسم البياني
+        self.figure.clear()
+        ax = self.figure.add_subplot(111)
+        
+        # رسم بيانات المعالج والذاكرة
+        ax.plot(self.cpu_history, label='استخدام المعالج %', color='blue')
+        ax.plot(self.mem_history, label='استخدام الذاكرة %', color='red')
+        
+        # إضافة خطوط إرشادية
+        ax.axhline(y=80, color='r', linestyle='--', alpha=0.3)
+        ax.axhline(y=60, color='y', linestyle='--', alpha=0.3)
+        
+        # إعداد التسميات
+        ax.set_title('أداء النظام')
+        ax.set_xlabel('الزمن (ثواني)')
+        ax.set_ylabel('النسبة %')
+        ax.legend(loc='upper right')
+        ax.grid(True)
+        
+        # تحديث الرسم
+        self.canvas.draw()
+    except Exception as e:
+        self.logger.error(f"خطأ في تحديث الرسم البياني: {str(e)}")
